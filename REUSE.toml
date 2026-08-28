@@ -1,3 +1,15 @@
 version = 1
 SPDX-PackageName = "app"
 SPDX-PackageDownloadLocation = "NOASSERTION"
+
+# These documents use this exact annotation instead of reader-visible headers.
+[[annotations]]
+path = [
+  "README.md",
+  "INSTALL.md",
+  "CLAUDE.md",
+  "docs/TROUBLESHOOTING.md",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Mark Phelps"
+SPDX-License-Identifier = "Apache-2.0"
