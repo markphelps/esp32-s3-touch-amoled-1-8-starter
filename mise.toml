@@ -83,6 +83,10 @@ description = "Save the current screen as a PNG file"
 depends = ["setup"]
 run = "python tools/screenshot.py"
 
+[tasks.test-host]
+description = "Run host-side task checks without a board"
+run = "python tools/test_task_cancellation.py && python tools/test_provision.py && python tools/test_portal.py && python tools/test_display_recovery.py && python tools/test_deprovision.py && python tools/test_backup.py && python tools/test_screenshot.py"
+
 [tasks.format]
 description = "Format the host tools with Ruff"
 run = "ruff format ."
