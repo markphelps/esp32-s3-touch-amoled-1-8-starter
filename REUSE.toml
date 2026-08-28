@@ -13,3 +13,11 @@ path = [
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Mark Phelps"
 SPDX-License-Identifier = "Apache-2.0"
+
+# Written by the ESP-IDF component manager. Regenerated on every dependency
+# change, so a hand-written header would not survive.
+[[annotations]]
+path = "firmware/dependencies.lock"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Mark Phelps"
+SPDX-License-Identifier = "Apache-2.0"
