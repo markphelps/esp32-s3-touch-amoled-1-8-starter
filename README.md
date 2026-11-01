@@ -7,6 +7,7 @@ The firmware uses ESP-IDF 5.5.5 and the Waveshare board support package. It incl
 - A 368 by 448 LVGL display with touch input.
 - Warm-reset recovery for the AMOLED panel.
 - A captive portal for WiFi setup.
+- NimBLE Bluetooth LE central/observer support with a passive scan demo.
 - A WiFi-only USB provisioning fallback.
 - An AXP2101 power monitor.
 - A USB screenshot channel.
@@ -74,6 +75,46 @@ If you cannot use the captive portal, write the WiFi values through USB:
 The command writes only `wifi_ssid` and `wifi_pass` to the NVS partition. It does not read credential values from the board.
 
 `provision` depends on `backup`. Thus, the command cannot overwrite the last chance to save a credential-free factory image.
+
+## Bluetooth LE
+
+The default firmware runs a passive scan after NVS initialization, including on
+the WiFi setup screen. It scans for ten seconds, logs BLE addresses and RSSI to
+`mise run monitor`, then pauses for sixty seconds. A scan summary counts
+advertisement reports, not unique devices. The demo does not pair, connect, or
+write to nearby devices. WiFi/Bluetooth software coexistence is enabled.
+
+Disable **App Bluetooth > Run the passive Bluetooth scan demo** with
+`mise run menuconfig` when you do not need the demo or are adding your own client.
+Disabling the demo prevents it from starting the Bluetooth host. Bluetooth
+support remains compiled and available to your application.
+
+`firmware/main/bluetooth.c` owns NimBLE startup, local address selection, reset
+notification, and the host task. Call `app_bluetooth_start` once after NVS
+initialization with a required `ready` callback and optional `reset` callback.
+It copies the callback configuration. A second successful start is rejected.
+
+The `ready` callback receives the local address type for NimBLE scan/connect
+calls and runs again after host recovery. Use `reset` to discard connection
+handles and cancel application timers. Both callbacks run on the NimBLE host
+task: do not block or call LVGL from them. Pass state to an LVGL timer or acquire
+the display lock outside the host callback when updating the screen.
+
+The scan demo illustrates bounded operations and delayed retries. Replace it
+with your own GATT client for a specific peripheral; the starter contains no
+sensor addresses or product protocols. Use only one owner of the host and scan
+procedure. The ESP32-S3 supports Bluetooth LE, not Bluetooth Classic audio.
+
+The host checks compile the Bluetooth lifecycle against a fake adapter using
+a C compiler and address/undefined-behavior sanitizers. Install Xcode command-line
+tools on macOS or GCC/Clang on Linux to run `mise run test-host`.
+
+The Bluetooth host and eligible WiFi/LwIP allocations use the board's PSRAM.
+This leaves internal memory for the display DMA buffer and task stacks; the
+internal-only Bluetooth default can make WiFi setup fail with `ESP_ERR_NO_MEM`.
+The display uses a 40-row temporary drawing buffer (29,440 bytes), leaving
+44,160 more bytes of internal RAM than the original 100-row buffer. Display
+resolution and full-frame screenshot storage are unchanged.
 
 ## Screen capture
 
