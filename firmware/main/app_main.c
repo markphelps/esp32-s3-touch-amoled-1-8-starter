@@ -11,6 +11,7 @@
 #include "bsp/display.h"
 #include "bsp/touch.h"
 #include "credentials.h"
+#include "bluetooth_demo.h"
 #include "diagnostics.h"
 #include "esp_log.h"
 #include "esp_lvgl_port.h"
@@ -25,7 +26,8 @@
 
 #define LVGL_TASK_CORE 1
 #define APP_TASK_CORE 0
-#define DISPLAY_BUFFER_ROWS 100
+// Leave internal DMA-capable RAM for WiFi buffers and the Bluetooth controller.
+#define DISPLAY_BUFFER_ROWS 40
 // The BSP defines a zero display-lock timeout as an indefinite wait.
 #define DISPLAY_LOCK_FOREVER_MS 0
 #define CO5300_QSPI_NOP 0x02000000
@@ -284,6 +286,16 @@ void app_main(void)
     }
     const bool provisioned = credentials_error == ESP_OK
         && provision_state == APP_PROVISION_COMPLETE;
+
+    // Portal preparation uses the ADC entropy source, which must stop before BLE starts.
+    if (credentials_error == ESP_OK) {
+#if CONFIG_APP_BLUETOOTH_SCAN_DEMO
+        esp_err_t bluetooth_error = app_bluetooth_demo_start();
+        if (bluetooth_error != ESP_OK) {
+            ESP_LOGW(TAG, "Bluetooth demo start failed: %s", esp_err_to_name(bluetooth_error));
+        }
+#endif
+    }
 
     if (!bsp_display_lock(0)) {
         ESP_LOGE(TAG, "LVGL lock failed");

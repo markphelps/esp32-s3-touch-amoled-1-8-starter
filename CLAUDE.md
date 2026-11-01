@@ -86,6 +86,15 @@ The demo UI runs a 250 ms LVGL timer on core 1. The startup task runs WiFi and t
 
 The UI timer reads WiFi status and free heap. A screen tap cycles brightness between 85 percent and 40 percent.
 
+`bluetooth.c` owns NimBLE initialization, address selection, and the host task.
+The default passive scan demo starts after NVS initialization in either startup
+state. Disable `APP_BLUETOOTH_SCAN_DEMO` before substituting another BLE client.
+Bluetooth callbacks run on the NimBLE task and must not block or call LVGL.
+The client must clear connection state and stop its timers after a host reset.
+Start Bluetooth only after `app_portal_prepare`: its temporary ADC entropy
+source must be disabled before radio initialization. Keep the PSRAM allocation
+settings and the 40-row display buffer together so WiFi has internal RAM.
+
 The AXP2101 power monitor uses an unpinned task. FreeRTOS can run this task on either core.
 
 ## Board-layer rules

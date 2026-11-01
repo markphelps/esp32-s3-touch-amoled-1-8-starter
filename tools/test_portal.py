@@ -356,6 +356,7 @@ def test_portal_entropy_and_qr_are_prepared_before_wifi() -> None:
     assert_order(
         app_main,
         "app_portal_prepare(&portal_configuration)",
+        "app_bluetooth_demo_start()",
         "xTaskCreatePinnedToCore(",
     )
     assert "app_portal_prepare" not in function_body(
