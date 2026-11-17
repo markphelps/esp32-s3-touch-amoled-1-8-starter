@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 Mark Phelps
+# SPDX-License-Identifier: Apache-2.0
+
+menu "App Bluetooth"
+    config APP_BLUETOOTH_SCAN_DEMO
+        bool "Run the passive Bluetooth scan demo"
+        default y
+        help
+            After NVS initialization, scan for ten seconds and log nearby BLE
+            addresses and RSSI, then pause for sixty seconds. No pairing,
+            connections, or writes to nearby devices occur. Disable this when
+            replacing the demo with your own Bluetooth client.
+endmenu

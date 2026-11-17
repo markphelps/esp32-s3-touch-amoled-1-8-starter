@@ -4,6 +4,8 @@
 idf_component_register(
     SRCS
         "app_main.c"
+        "bluetooth.c"
+        "bluetooth_demo.c"
         "credentials.c"
         "diagnostics.c"
         "power.c"
@@ -15,6 +17,7 @@ idf_component_register(
     INCLUDE_DIRS "."
     REQUIRES
         bootloader_support
+        bt
         esp32_s3_touch_amoled_1_8
         esp_driver_usb_serial_jtag
         esp_http_server
